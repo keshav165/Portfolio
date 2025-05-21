@@ -57,8 +57,8 @@ export default function RootLayout({
       <body className={`${inter.className} min-h-screen bg-background`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <MainLayout>{children}</MainLayout>
