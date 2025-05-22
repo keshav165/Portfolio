@@ -45,6 +45,14 @@ export function SplineModel() {
       splineViewer.setAttribute('events-toggle', 'true');
       splineViewer.setAttribute('events-sync', 'true');
       splineViewer.setAttribute('shadow-quality', 'soft');
+      splineViewer.setAttribute('pointer-events', 'auto');
+      splineViewer.setAttribute('interactive', 'true');
+      splineViewer.setAttribute('renderer', 'webgl');
+      splineViewer.style.width = '100%';
+      splineViewer.style.height = '100%';
+      splineViewer.style.position = 'absolute';
+      splineViewer.style.top = '0';
+      splineViewer.style.left = '0';
       
       // Handle loading state
       splineViewer.onload = () => {
@@ -96,10 +104,14 @@ export function SplineModel() {
   }, []);
 
   return (
-    <div className="relative w-full h-full min-h-[400px] md:min-h-[500px] lg:min-h-[600px] bg-transparent">
+    <div 
+      className="relative w-full h-full min-h-[400px] md:min-h-[500px] lg:min-h-[600px] bg-transparent"
+      style={{ position: 'relative', touchAction: 'none' }}
+    >
       <div 
         ref={splineRef} 
         className="w-full h-full"
+        style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}
       />
       
       {isLoading && !error && (
