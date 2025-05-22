@@ -42,8 +42,8 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self' data: blob: https:;",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:;",
-              "style-src 'self' 'unsafe-inline' https:;",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: 'strict-dynamic' 'unsafe-hashes' 'report-sample';",
+              "style-src 'self' 'unsafe-inline' https: 'unsafe-hashes' 'report-sample';",
               "img-src 'self' data: blob: https:;",
               "connect-src 'self' https: wss:;",
               "frame-src 'self' https:;",
@@ -55,9 +55,7 @@ const nextConfig = {
               "base-uri 'self';",
               "form-action 'self';",
               "frame-ancestors 'none';",
-              "upgrade-insecure-requests;",
-              "require-trusted-types-for 'script';",
-              "trusted-types default"
+              "upgrade-insecure-requests;"
             ].join(' ')
           }
         ]
