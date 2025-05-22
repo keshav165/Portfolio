@@ -76,36 +76,46 @@ export function Footer() {
                 Navigation
               </h4>
               <nav className="flex flex-col space-y-2">
-                <Link
-                  href="/"
-                  className="text-foreground/60 hover:text-primary transition-colors text-sm"
+                <a
+                  href="/#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = '/';
+                  }}
+                  className="text-foreground/60 hover:text-primary transition-colors text-sm cursor-pointer"
                 >
                   Home
-                </Link>
-                <Link
-                  href="/about"
-                  className="text-foreground/60 hover:text-primary transition-colors text-sm"
+                </a>
+                <a
+                  href="/#about"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = '/#about';
+                  }}
+                  className="text-foreground/60 hover:text-primary transition-colors text-sm cursor-pointer"
                 >
                   About
-                </Link>
-                <Link
-                  href="/work"
-                  className="text-foreground/60 hover:text-primary transition-colors text-sm"
+                </a>
+                <a
+                  href="/#work"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = '/#work';
+                  }}
+                  className="text-foreground/60 hover:text-primary transition-colors text-sm cursor-pointer"
                 >
                   Work
-                </Link>
-                <Link
-                  href="/blog"
-                  className="text-foreground/60 hover:text-primary transition-colors text-sm"
-                >
-                  Blog
-                </Link>
-                <Link
-                  href="/contact"
-                  className="text-foreground/60 hover:text-primary transition-colors text-sm"
+                </a>
+                <a
+                  href="/#contact"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = '/#contact';
+                  }}
+                  className="text-foreground/60 hover:text-primary transition-colors text-sm cursor-pointer"
                 >
                   Contact
-                </Link>
+                </a>
               </nav>
             </motion.div>
           </div>
@@ -116,18 +126,26 @@ export function Footer() {
             © {currentYear} Keshav. All rights reserved.
           </p>
           <div className="flex items-center space-x-6 mt-4 md:mt-0">
-            <Link
-              href="/privacy"
-              className="text-sm text-foreground/60 hover:text-foreground transition-colors"
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                window.location.href = '/#privacy';
+              }}
+              className="text-sm text-foreground/60 hover:text-foreground transition-colors cursor-pointer"
             >
               Privacy Policy
-            </Link>
-            <Link
-              href="/terms"
-              className="text-sm text-foreground/60 hover:text-foreground transition-colors"
+            </a>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                window.location.href = '/#terms';
+              }}
+              className="text-sm text-foreground/60 hover:text-foreground transition-colors cursor-pointer"
             >
               Terms of Service
-            </Link>
+            </a>
           </div>
         </div>
       </div>
