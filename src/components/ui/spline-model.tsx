@@ -72,33 +72,70 @@ export function SplineModel() {
     };
 
     // Check if the script is already loaded
-    let script = document.querySelector('script[src*="spline-viewer"]') as HTMLScriptElement | null;
-    
-    if (!script) {
-      // Load the script if not already loaded
-      script = document.createElement('script') as HTMLScriptElement;
-      script.src = 'https://unpkg.com/@splinetool/viewer@1.9.96/build/spline-viewer.js';
-      script.type = 'module';
-      script.async = true;
+    const loadScript = () => {
+      // Create a script element
+      const script = document.createElement('script');
+      
+      // Set attributes
+      script.setAttribute('type', 'module');
+      script.setAttribute('async', '');
+      script.setAttribute('crossorigin', 'anonymous');
+      
+      // Set the source URL
+      const scriptUrl = 'https://unpkg.com/@splinetool/viewer@1.9.96/build/spline-viewer.js';
+      
+      // Use Trusted Types if available, otherwise use direct assignment
+      try {
+        if (window.trustedTypes) {
+          const policy = window.trustedTypes.createPolicy('spline-viewer', {
+            createScriptURL: (url: string) => url
+          });
+          if (policy) {
+            script.src = policy.createScriptURL(scriptUrl);
+          } else {
+            script.src = scriptUrl;
+          }
+        } else {
+          script.src = scriptUrl;
+        }
+      } catch (e) {
+        console.warn('Failed to create trusted URL, falling back to direct URL', e);
+        script.src = scriptUrl;
+      }
+      
+      // Event handlers
       script.onload = loadSpline as unknown as (this: GlobalEventHandlers, ev: Event) => any;
       script.onerror = () => {
         console.error('Failed to load Spline viewer script');
         setIsLoading(false);
         setError('Failed to load 3D viewer resources.');
       };
+      
+      // Append to head
       document.head.appendChild(script);
-    } else if (window.customElements && window.customElements.get('spline-viewer')) {
+      
+      // Return the script element for cleanup
+      return script;
+    };
+    
+    let script: HTMLScriptElement | null = null;
+    
+    // Check if already loaded or load it
+    if (window.customElements && window.customElements.get('spline-viewer')) {
       // If script is already loaded and custom element is defined
       loadSpline();
     } else {
-      // If script is loaded but custom element isn't defined yet
-      script.addEventListener('load', loadSpline);
+      // Load the script
+      script = loadScript();
     }
 
     // Cleanup
     return () => {
       if (script) {
-        script.removeEventListener('load', loadSpline);
+        script.removeEventListener('load', loadSpline as EventListener);
+        if (script.parentNode) {
+          script.parentNode.removeChild(script);
+        }
       }
     };
   }, []);
