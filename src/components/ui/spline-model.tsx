@@ -3,15 +3,18 @@
 import { useEffect, useState, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 
-// Dynamically import the Spline component with no SSR
-const Spline = dynamic(() => import('@splinetool/react-spline'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center w-full h-full min-h-[400px] md:min-h-[500px] lg:min-h-[600px]">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-    </div>
-  )
-});
+// Correct way to import Spline - it's a default export
+const Spline = dynamic(
+  () => import('@splinetool/react-spline'),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center w-full h-full min-h-[400px] md:min-h-[500px] lg:min-h-[600px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+);
 
 interface SplineProps {
   scene: string;
