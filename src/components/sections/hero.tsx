@@ -5,10 +5,9 @@ import { fadeIn, staggerContainer } from '@/lib/animations';
 import { ParallaxWrapper } from '@/components/ui/parallax-wrapper';
 import { ScrollProgress } from '@/components/ui/scroll-progress';
 import { Button } from '@/components/ui/button';
-import { SplineModel } from '@/components/ui/spline-model';
-// @ts-ignore - Using deprecated icon to avoid additional dependencies
+import Spline from '@splinetool/react-spline';
 import { ChevronDown, ArrowRight, Github, X, Mail, Linkedin } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, Suspense } from 'react';
 import Image from 'next/image';
 
 const TITLES = [
@@ -48,6 +47,41 @@ const SOCIAL_LINKS = [
 
 export function Hero() {
   const [currentTitleIndex, setCurrentTitleIndex] = useState(0);
+  const [isSplineLoading, setIsSplineLoading] = useState(true);
+  const [splineError, setSplineError] = useState<string | null>(null);
+  const splineRef = useRef<any>(null);
+
+  const handleSplineLoad = (spline: any) => {
+    splineRef.current = spline;
+    setIsSplineLoading(false);
+    setSplineError(null);
+
+    const canvas = document.querySelector('canvas');
+    if (canvas) {
+      canvas.style.touchAction = 'none';
+
+      const preventDefault = (e: Event) => {
+        if (e.target === canvas) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      };
+
+      canvas.addEventListener('wheel', preventDefault, { passive: false } as AddEventListenerOptions);
+      canvas.addEventListener('touchmove', preventDefault, { passive: false } as AddEventListenerOptions);
+
+      return () => {
+        canvas.removeEventListener('wheel', preventDefault);
+        canvas.removeEventListener('touchmove', preventDefault);
+      };
+    }
+  };
+
+  const handleSplineError = () => {
+    setIsSplineLoading(false);
+    setSplineError('Failed to load 3D model. Please refresh the page to try again.');
+  };
+
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
@@ -88,14 +122,9 @@ export function Hero() {
   });
 
   return (
-    <section
-      ref={containerRef}
-      className="relative min-h-screen flex items-center justify-center pt-20 pb-24 overflow-hidden"
-      id="home"
-    >
+    <section ref={containerRef} className="relative min-h-screen flex items-center justify-center pt-20 pb-24 overflow-hidden" id="home">
       <ScrollProgress />
 
-      {/* Background Effects */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-5" />
         <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-background/90" />
@@ -113,22 +142,10 @@ export function Hero() {
         </ParallaxWrapper>
       </div>
 
-      {/* Hero Content */}
       <div className="container mx-auto px-4 relative z-10">
-        <motion.div
-          className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
-          initial="hidden"
-          animate={isInView ? 'show' : 'hidden'}
-          variants={staggerContainer(0.1)}
-        >
-          {/* Text Column */}
+        <motion.div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center" initial="hidden" animate={isInView ? 'show' : 'hidden'} variants={staggerContainer(0.1)}>
           <div className="space-y-6 text-center md:text-left">
-            <motion.div
-              className="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
-            >
+            <motion.div className="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }}>
               <span className="relative flex h-2 w-2 mr-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/75 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
@@ -137,44 +154,17 @@ export function Hero() {
             </motion.div>
 
             <div ref={titleRef}>
-              <motion.h1
-                className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight"
-                variants={fadeInVariant(0.4)}
-                initial="hidden"
-                animate={isTitleInView ? 'visible' : 'hidden'}
-              >
+              <motion.h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight" variants={fadeInVariant(0.4)} initial="hidden" animate={isTitleInView ? 'visible' : 'hidden'}>
                 <span className="block text-foreground">Hi, I'm</span>
-                <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                  Keshav
-                </span>
+                <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">Keshav</span>
               </motion.h1>
-              <motion.p
-                className="text-lg mt-4 text-muted-foreground"
-                variants={fadeInVariant(0.5)}
-                initial="hidden"
-                animate={isTitleInView ? 'visible' : 'hidden'}
-              >
+              <motion.p className="text-lg mt-4 text-muted-foreground" variants={fadeInVariant(0.5)} initial="hidden" animate={isTitleInView ? 'visible' : 'hidden'}>
                 {TITLES[currentTitleIndex]} <br />
-                I'm a passionate developer who loves to build innovative solutions using modern technologies.
-                Let's create something amazing together!
+                I'm a passionate developer who loves to build innovative solutions using modern technologies. Let's create something amazing together!
               </motion.p>
             </div>
 
-            <motion.div
-              className="flex flex-wrap gap-4 pt-4"
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                show: {
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    duration: 0.6,
-                    delay: 0.5,
-                    ease: 'easeOut'
-                  }
-                }
-              }}
-            >
+            <motion.div className="flex flex-wrap gap-4 pt-4" variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, delay: 0.5, ease: 'easeOut' }}}}>
               <Button size="lg" className="group px-6" onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}>
                 View My Work <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
@@ -183,21 +173,8 @@ export function Hero() {
               </Button>
             </motion.div>
 
-            <motion.div 
-              className="flex items-center gap-4 pt-4" 
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                show: {
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    staggerChildren: 0.1,
-                    delayChildren: 0.6
-                  }
-                }
-              }}
-            >
-              {SOCIAL_LINKS.map((link, index) => (
+            <motion.div className="flex items-center gap-4 pt-4" variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { staggerChildren: 0.1, delayChildren: 0.6 }}}}>
+              {SOCIAL_LINKS.map((link) => (
                 <motion.a
                   key={link.name}
                   href={link.url}
@@ -205,17 +182,7 @@ export function Hero() {
                   rel="noopener noreferrer"
                   className={`p-2 rounded-full bg-muted/50 hover:bg-muted transition-colors ${link.color} relative group`}
                   whileHover={{ y: -3 }}
-                  variants={{
-                    hidden: { opacity: 0, y: 20 },
-                    show: {
-                      opacity: 1,
-                      y: 0,
-                      transition: {
-                        duration: 0.5,
-                        ease: 'easeOut'
-                      }
-                    }
-                  }}
+                  variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' }}}}
                 >
                   {link.icon}
                   <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-foreground text-background text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
@@ -226,43 +193,58 @@ export function Hero() {
             </motion.div>
           </div>
 
-          {/* 3D Model */}
-          <motion.div 
-            className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center"
-            variants={{
-              hidden: { opacity: 0, x: -40 },
-              show: {
-                opacity: 1,
-                x: 0,
-                transition: {
-                  duration: 0.8,
-                  delay: 0.7,
-                  ease: [0.25, 0.25, 0, 1]
-                }
-              }
-            }}
-          >
+          <motion.div className="relative w-full h-[900px] md:h-[900px] lg:h-[600px] flex items-center justify-center" variants={{ hidden: { opacity: 0, x: -40 }, show: { opacity: 1, x: 0, transition: { duration: 0.8, delay: 0.7, ease: [0.25, 0.25, 0, 1] }}}}>
             <div className="relative w-full h-full max-w-2xl">
-              <SplineModel />
+              <Suspense fallback={
+                <div className="flex items-center justify-center w-full h-full">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+              }>
+                <div className="relative w-full h-full">
+                  <div className="w-full h-full relative">
+                    <div style={{
+                      position: 'absolute',
+                      inset: 0,
+                      backgroundColor: 'hsl(var(--background))',
+                      zIndex: 1
+                    }} />
+                    <Spline 
+                      scene="https://prod.spline.design/ubEX5XXkdYXvibMs/scene.splinecode" 
+                      onLoad={handleSplineLoad} 
+                      onError={handleSplineError} 
+                      style={{ 
+                        width: '100%', 
+                        height: '100%', 
+                        backgroundColor: 'transparent',
+                        position: 'relative',
+                        zIndex: 1,
+                        pointerEvents: 'auto',
+                        touchAction: 'none',
+                        borderRadius: '1rem',
+                        overflow: 'hidden'
+                      }} 
+                    />
+                  </div>
+                  {isSplineLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                    </div>
+                  )}
+                  {splineError && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 text-center">
+                      <p className="text-foreground/80">{splineError}</p>
+                    </div>
+                  )}
+                </div>
+              </Suspense>
             </div>
           </motion.div>
         </motion.div>
       </div>
 
-      {/* Scroll Indicator */}
-      <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 2 }}
-      >
-        <motion.span
-          className="text-sm text-muted-foreground mb-2 flex items-center"
-          animate={{ y: [0, 5, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <ChevronDown className="h-4 w-4 mr-2" />
-          Scroll down
+      <motion.div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2 }}>
+        <motion.span className="text-sm text-muted-foreground mb-2 flex items-center" animate={{ y: [0, 5, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
+          <ChevronDown className="h-5 w-5" />
         </motion.span>
       </motion.div>
     </section>
