@@ -1,6 +1,20 @@
 import { Variants } from 'framer-motion';
 
-export const fadeIn = (direction: 'up' | 'down' | 'left' | 'right' = 'up', delay = 0): Variants => ({
+interface FadeInOptions {
+  direction?: 'up' | 'down' | 'left' | 'right';
+  delay?: number;
+  duration?: number;
+  type?: string;
+  ease?: number[] | string;
+}
+
+export const fadeIn = (
+  direction: 'up' | 'down' | 'left' | 'right' = 'up',
+  delay = 0,
+  duration = 0.8,
+  type = 'tween',
+  ease: number[] | string = [0.25, 0.25, 0, 1]
+): Variants => ({
   hidden: {
     y: direction === 'up' ? 80 : direction === 'down' ? -80 : 0,
     x: direction === 'left' ? 80 : direction === 'right' ? -80 : 0,
@@ -11,10 +25,10 @@ export const fadeIn = (direction: 'up' | 'down' | 'left' | 'right' = 'up', delay
     x: 0,
     opacity: 1,
     transition: {
-      type: 'tween',
-      duration: 0.8,
+      type,
+      duration,
       delay: delay * 0.2,
-      ease: [0.25, 0.25, 0, 1],
+      ease,
     },
   },
 });

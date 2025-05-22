@@ -16,6 +16,14 @@ const Spline = dynamic(
   }
 );
 
+interface SplineProps {
+  scene: string;
+  onLoad?: () => void;
+  onError?: (error: Error) => void;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
 export function SplineModel() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +55,7 @@ export function SplineModel() {
             onLoad={handleLoad}
             onError={handleError}
             className="w-full h-full"
+            style={{ width: '100%', height: '100%' }}
           />
         </div>
       </Suspense>
