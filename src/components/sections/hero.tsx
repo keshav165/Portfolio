@@ -5,6 +5,7 @@ import { fadeIn, staggerContainer } from '@/lib/animations';
 import { ParallaxWrapper } from '@/components/ui/parallax-wrapper';
 import { ScrollProgress } from '@/components/ui/scroll-progress';
 import { Button } from '@/components/ui/button';
+import { SplineModel } from '@/components/ui/spline-model';
 // @ts-ignore - Using deprecated icon to avoid additional dependencies
 import { ChevronDown, ArrowRight, Github, X, Mail, Linkedin } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -225,9 +226,9 @@ export function Hero() {
             </motion.div>
           </div>
 
-          {/* Illustration */}
+          {/* 3D Model */}
           <motion.div 
-            className="relative h-80 md:h-[32rem] lg:h-[36rem]" 
+            className="relative w-full h-[400px] md:h-[500px] lg:h-[600px]"
             variants={{
               hidden: { opacity: 0, x: -40 },
               show: {
@@ -241,32 +242,7 @@ export function Hero() {
               }
             }}
           >
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="relative w-full h-full max-w-md">
-                <motion.div
-                  className="absolute inset-0 rounded-3xl bg-primary/10"
-                  animate={{
-                    borderRadius: ['60% 40% 30% 70% / 60% 30% 70% 40%', '30% 60% 70% 40% / 50% 60% 30% 60%'],
-                  }}
-                  transition={{
-                    duration: 10,
-                    repeat: Infinity,
-                    repeatType: 'reverse',
-                    ease: 'easeInOut',
-                  }}
-                />
-                <div className="relative z-10 w-full h-full flex items-center justify-center">
-                  <Image
-                    src="/images/hero-illustration.svg"
-                    alt="Hero Illustration"
-                    fill
-                    className="object-contain"
-                    priority
-                  />
-                </div>
-
-              </div>
-            </div>
+            <SplineModel />
           </motion.div>
         </motion.div>
       </div>
