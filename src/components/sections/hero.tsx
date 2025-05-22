@@ -228,7 +228,7 @@ export function Hero() {
 
           {/* 3D Model */}
           <motion.div 
-            className="relative w-full h-[400px] md:h-[500px] lg:h-[600px]"
+            className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center"
             variants={{
               hidden: { opacity: 0, x: -40 },
               show: {
@@ -242,7 +242,9 @@ export function Hero() {
               }
             }}
           >
-            <SplineModel />
+            <div className="relative w-full h-full max-w-2xl">
+              <SplineModel />
+            </div>
           </motion.div>
         </motion.div>
       </div>
