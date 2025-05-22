@@ -3,9 +3,9 @@
 import { useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 
-// Dynamically import the Spline component with SSR disabled
+// Use the Spline component with dynamic import and no SSR
 const Spline = dynamic(
-  () => import('@splinetool/react-spline').then((mod) => mod.Spline),
+  () => import('@splinetool/react-spline'),
   { 
     ssr: false,
     loading: () => (
@@ -25,8 +25,8 @@ export function SplineModel() {
     setError(null);
   }, []);
 
-  const handleError = useCallback((error: Error) => {
-    console.error('Spline error:', error);
+  const handleError = useCallback((event: React.SyntheticEvent<HTMLDivElement>) => {
+    console.error('Spline error:', event);
     setIsLoading(false);
     setError('Failed to load 3D model. Please try again later.');
   }, []);
