@@ -8,9 +8,21 @@ import { Button } from '@/components/ui/button';
 import dynamic from 'next/dynamic';
 import { ChevronDown, ArrowRight, Github, X, Mail, Linkedin } from 'lucide-react';
 import { useEffect, useRef, useState, Suspense } from 'react';
-import Image from 'next/image';
 
-const Spline = dynamic(() => import('@splinetool/react-spline'), {
+// Using a dynamic import with a custom loader for Spline
+const Spline = dynamic(async () => {
+  try {
+    const SplineComponent = (await import('@splinetool/react-spline')).default;
+    return (props: any) => <SplineComponent {...props} />;
+  } catch (e) {
+    console.error('Failed to load Spline component', e);
+    return () => <div className="w-full h-full bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg flex items-center justify-center">
+      <div className="text-center p-4">
+        <p className="text-red-500">Failed to load 3D model</p>
+      </div>
+    </div>;
+  }
+}, {
   ssr: false,
   loading: () => <div className="w-full h-full bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg" />
 });
@@ -220,24 +232,27 @@ export function Hero() {
                       zIndex: 1
                     }} />
                     {isClient && (
-                      <Spline
-                        scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode"
-                        onLoad={handleSplineLoad as any}
-                        onError={handleSplineError as any}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          backgroundColor: 'transparent',
-                          position: 'relative',
-                          zIndex: 1,
-                          pointerEvents: 'auto',
-                          touchAction: 'none',
-                          borderRadius: '1rem',
-                          overflow: 'hidden',
-                          opacity: isSplineLoading ? 0 : 1,
-                          transition: 'opacity 0.5s ease-in-out'
-                        }}
-                      />
+                      <div className="w-full h-full" style={{
+                        opacity: isSplineLoading ? 0 : 1,
+                        transition: 'opacity 0.5s ease-in-out'
+                      }}>
+                        <Spline
+                          scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode"
+                          onLoad={handleSplineLoad}
+                          onError={handleSplineError}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            backgroundColor: 'transparent',
+                            position: 'relative',
+                            zIndex: 1,
+                            pointerEvents: 'auto',
+                            touchAction: 'none',
+                            borderRadius: '1rem',
+                            overflow: 'hidden'
+                          }}
+                        />
+                      </div>
                     )}
                   </div>
                   {isSplineLoading && (

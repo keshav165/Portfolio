@@ -57,15 +57,12 @@ const nextConfig = {
   },
 
   experimental: {
-    esmExternals: false,
-    // Enable server actions
-    serverActions: true,
-    // Enable experimental React features
-    serverComponentsExternalPackages: ['@splinetool/react-spline'],
     // Enable modern browser features
     optimizeCss: true,
-    // Enable webpack 5
-    webpack5: true,
+    // Enable server components external packages
+    serverComponentsExternalPackages: ['@splinetool/react-spline'],
+    // Disable esmExternals as it's causing issues with Spline
+    esmExternals: false
   },
 
   async headers() {
