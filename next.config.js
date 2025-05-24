@@ -76,7 +76,7 @@ const nextConfig = {
               default-src 'self';
               script-src 'self' 'unsafe-inline' 'unsafe-eval' https://prod.spline.design https://unpkg.com https://spline.design;
               style-src 'self' 'unsafe-inline';
-              img-src 'self' data: blob: https://prod.spline.design https://unpkg.com https://spline.design https://s3-alpha.figma.com https://*.spline.design https://spline-3d.s3.us-west-2.amazonaws.com https://images.unsplash.com;
+              img-src 'self' data: blob: https://prod.spline.design https://unpkg.com https://spline.design https://s3-alpha.figma.com https://*.spline.design https://spline-3d.s3.us-west-2.amazonaws.com https://images.unsplash.com https://miro.medium.com https://mavigadget.com https://assets.architecturaldigest.in;
               connect-src 'self' https://prod.spline.design https://unpkg.com https://spline.design https://s3-alpha.figma.com https://*.spline.design https://spline-3d.s3.us-west-2.amazonaws.com;
               frame-src 'self' https://prod.spline.design https://unpkg.com https://spline.design;
               worker-src 'self' blob:;
