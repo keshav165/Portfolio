@@ -222,8 +222,8 @@ export function Hero() {
                     {isClient && (
                       <Spline
                         scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode"
-                        onLoad={handleSplineLoad}
-                        onError={handleSplineError}
+                        onLoad={handleSplineLoad as any}
+                        onError={handleSplineError as any}
                         style={{
                           width: '100%',
                           height: '100%',

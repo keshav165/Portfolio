@@ -36,33 +36,21 @@ const nextConfig = {
       path: require.resolve('path-browserify'),
       stream: require.resolve('stream-browserify'),
       crypto: require.resolve('crypto-browserify'),
+      net: false,
+      tls: false,
+      dns: false,
+      child_process: false,
+      module: false,
     };
 
-    // Add polyfills for Node.js core modules
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-        dns: false,
-        child_process: false,
-        module: false,
-      };
-    }
-
-    
     // Handle the spline package specifically
     config.module.rules.push({
       test: /\.m?js$/,
-      exclude: /node_modules\/(?!@splinetool)/,
-      use: {
-        loader: 'babel-loader',
-        options: {
-          presets: ['@babel/preset-env'],
-          plugins: ['@babel/plugin-transform-runtime'],
-        },
-      },
+      include: /node_modules\/@splinetool/,
+      type: 'javascript/auto',
+      resolve: {
+        fullySpecified: false
+      }
     });
 
     return config;
