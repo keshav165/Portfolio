@@ -20,13 +20,50 @@ const nextConfig = {
   webpack: (config, { isServer }) => {
     // Enable WebAssembly support
     config.experiments = {
-      ...config.experiments,
+      ...(config.experiments || {}),
       asyncWebAssembly: true,
+      layers: true,
     };
 
     config.output.webassemblyModuleFilename = isServer
       ? '../static/wasm/[modulehash].wasm'
       : 'static/wasm/[modulehash].wasm';
+
+    // Add fallback for the spline package
+    config.resolve.fallback = {
+      ...(config.resolve.fallback || {}),
+      fs: false,
+      path: require.resolve('path-browserify'),
+      stream: require.resolve('stream-browserify'),
+      crypto: require.resolve('crypto-browserify'),
+    };
+
+    // Add polyfills for Node.js core modules
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        dns: false,
+        child_process: false,
+        module: false,
+      };
+    }
+
+    
+    // Handle the spline package specifically
+    config.module.rules.push({
+      test: /\.m?js$/,
+      exclude: /node_modules\/(?!@splinetool)/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env'],
+          plugins: ['@babel/plugin-transform-runtime'],
+        },
+      },
+    });
 
     return config;
   },
