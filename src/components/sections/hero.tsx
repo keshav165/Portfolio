@@ -5,10 +5,15 @@ import { fadeIn, staggerContainer } from '@/lib/animations';
 import { ParallaxWrapper } from '@/components/ui/parallax-wrapper';
 import { ScrollProgress } from '@/components/ui/scroll-progress';
 import { Button } from '@/components/ui/button';
-import Spline from '@splinetool/react-spline';
+import dynamic from 'next/dynamic';
 import { ChevronDown, ArrowRight, Github, X, Mail, Linkedin } from 'lucide-react';
 import { useEffect, useRef, useState, Suspense } from 'react';
 import Image from 'next/image';
+
+const Spline = dynamic(() => import('@splinetool/react-spline'), {
+  ssr: false,
+  loading: () => <div className="w-full h-full bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg" />
+});
 
 const TITLES = [
   'Machine Learning Engineer',
@@ -49,7 +54,12 @@ export function Hero() {
   const [currentTitleIndex, setCurrentTitleIndex] = useState(0);
   const [isSplineLoading, setIsSplineLoading] = useState(true);
   const [splineError, setSplineError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
   const splineRef = useRef<any>(null);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSplineLoad = (spline: any) => {
     splineRef.current = spline;
@@ -77,9 +87,10 @@ export function Hero() {
     }
   };
 
-  const handleSplineError = () => {
+  const handleSplineError = (error: any) => {
+    console.error('Spline error:', error);
+    setSplineError('Failed to load 3D model. Please try again later.');
     setIsSplineLoading(false);
-    setSplineError('Failed to load 3D model. Please refresh the page to try again.');
   };
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -208,22 +219,26 @@ export function Hero() {
                       backgroundColor: 'hsl(var(--background))',
                       zIndex: 1
                     }} />
-                    <Spline 
-                      scene="https://prod.spline.design/ubEX5XXkdYXvibMs/scene.splinecode" 
-                      onLoad={handleSplineLoad} 
-                      onError={handleSplineError} 
-                      style={{ 
-                        width: '100%', 
-                        height: '100%', 
-                        backgroundColor: 'transparent',
-                        position: 'relative',
-                        zIndex: 1,
-                        pointerEvents: 'auto',
-                        touchAction: 'none',
-                        borderRadius: '1rem',
-                        overflow: 'hidden'
-                      }} 
-                    />
+                    {isClient && (
+                      <Spline
+                        scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode"
+                        onLoad={handleSplineLoad}
+                        onError={handleSplineError}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          backgroundColor: 'transparent',
+                          position: 'relative',
+                          zIndex: 1,
+                          pointerEvents: 'auto',
+                          touchAction: 'none',
+                          borderRadius: '1rem',
+                          overflow: 'hidden',
+                          opacity: isSplineLoading ? 0 : 1,
+                          transition: 'opacity 0.5s ease-in-out'
+                        }}
+                      />
+                    )}
                   </div>
                   {isSplineLoading && (
                     <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
@@ -232,7 +247,7 @@ export function Hero() {
                   )}
                   {splineError && (
                     <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 text-center">
-                      <p className="text-foreground/80">{splineError}</p>
+                      <p className="text-destructive">{splineError}</p>
                     </div>
                   )}
                 </div>
@@ -242,10 +257,14 @@ export function Hero() {
         </motion.div>
       </div>
 
-      <motion.div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2 }}>
-        <motion.span className="text-sm text-muted-foreground mb-2 flex items-center" animate={{ y: [0, 5, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
-          <ChevronDown className="h-5 w-5" />
-        </motion.span>
+      <motion.div 
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center text-muted-foreground text-sm"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.5, duration: 0.6 }}
+      >
+        <span>Scroll to explore</span>
+        <ChevronDown className="h-5 w-5 mt-2 animate-bounce" />
       </motion.div>
     </section>
   );
