@@ -9,22 +9,9 @@ import dynamic from 'next/dynamic';
 import { ChevronDown, ArrowRight, Github, X, Mail, Linkedin } from 'lucide-react';
 import { useEffect, useRef, useState, Suspense } from 'react';
 
-// Using a dynamic import with a custom loader for Spline
-const Spline = dynamic(async () => {
-  try {
-    const SplineComponent = (await import('@splinetool/react-spline')).default;
-    return (props: any) => <SplineComponent {...props} />;
-  } catch (e) {
-    console.error('Failed to load Spline component', e);
-    return () => <div className="w-full h-full bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg flex items-center justify-center">
-      <div className="text-center p-4">
-        <p className="text-red-500">Failed to load 3D model</p>
-      </div>
-    </div>;
-  }
-}, {
+const Spline = dynamic(() => import('@splinetool/react-spline'), {
   ssr: false,
-  loading: () => <div className="w-full h-full bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg" />
+  loading: () => <div className="w-full h-full bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg" />,
 });
 
 const TITLES = [
@@ -64,47 +51,6 @@ const SOCIAL_LINKS = [
 
 export function Hero() {
   const [currentTitleIndex, setCurrentTitleIndex] = useState(0);
-  const [isSplineLoading, setIsSplineLoading] = useState(true);
-  const [splineError, setSplineError] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
-  const splineRef = useRef<any>(null);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  const handleSplineLoad = (spline: any) => {
-    splineRef.current = spline;
-    setIsSplineLoading(false);
-    setSplineError(null);
-
-    const canvas = document.querySelector('canvas');
-    if (canvas) {
-      canvas.style.touchAction = 'none';
-
-      const preventDefault = (e: Event) => {
-        if (e.target === canvas) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      };
-
-      canvas.addEventListener('wheel', preventDefault, { passive: false } as AddEventListenerOptions);
-      canvas.addEventListener('touchmove', preventDefault, { passive: false } as AddEventListenerOptions);
-
-      return () => {
-        canvas.removeEventListener('wheel', preventDefault);
-        canvas.removeEventListener('touchmove', preventDefault);
-      };
-    }
-  };
-
-  const handleSplineError = (error: any) => {
-    console.error('Spline error:', error);
-    setSplineError('Failed to load 3D model. Please try again later.');
-    setIsSplineLoading(false);
-  };
-
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
@@ -220,67 +166,15 @@ export function Hero() {
             <div className="relative w-full h-full max-w-2xl">
               <Suspense fallback={
                 <div className="flex items-center justify-center w-full h-full">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-t-transparent border-primary"></div>
                 </div>
               }>
-                <div className="relative w-full h-full">
-                  <div className="w-full h-full relative">
-                    <div style={{
-                      position: 'absolute',
-                      inset: 0,
-                      backgroundColor: 'hsl(var(--background))',
-                      zIndex: 1
-                    }} />
-                    {isClient && (
-                      <div className="w-full h-full" style={{
-                        opacity: isSplineLoading ? 0 : 1,
-                        transition: 'opacity 0.5s ease-in-out'
-                      }}>
-                        <Spline
-                          scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode"
-                          onLoad={handleSplineLoad}
-                          onError={handleSplineError}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            backgroundColor: 'transparent',
-                            position: 'relative',
-                            zIndex: 1,
-                            pointerEvents: 'auto',
-                            touchAction: 'none',
-                            borderRadius: '1rem',
-                            overflow: 'hidden'
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  {isSplineLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-                    </div>
-                  )}
-                  {splineError && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 text-center">
-                      <p className="text-destructive">{splineError}</p>
-                    </div>
-                  )}
-                </div>
+                <Spline scene="https://prod.spline.design/H7idHqYKAD8aWYv7/scene.splinecode" />
               </Suspense>
             </div>
           </motion.div>
         </motion.div>
       </div>
-
-      <motion.div 
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center text-muted-foreground text-sm"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.5, duration: 0.6 }}
-      >
-        <span>Scroll to explore</span>
-        <ChevronDown className="h-5 w-5 mt-2 animate-bounce" />
-      </motion.div>
     </section>
   );
 }
